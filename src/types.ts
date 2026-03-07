@@ -33,6 +33,8 @@ export interface SessionPlayer {
   id: number;
   session_id: number;
   name: string;
+  emoji: string;
+  color: string;
 }
 
 export interface RoundScore {
@@ -53,6 +55,8 @@ export interface Round {
 export interface ScoreboardEntry {
   id: number;
   name: string;
+  emoji: string;
+  color: string;
   total_score: number;
   rounds_won: number;
 }
@@ -62,6 +66,8 @@ export interface Session {
   owner_id: number;
   group_id: number | null;
   title: string;
+  session_type?: never
+  max_score: number;
   status: 'active' | 'finished';
   winner_player_id: number | null;
   winner_name?: string;
@@ -92,6 +98,8 @@ export interface GroupRankingResponse {
 
 export interface PlayerSuggestion {
   name: string;
+  emoji: string;
+  color: string;
   use_count: number;
   last_used: string;
 }

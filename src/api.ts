@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost/apli-placar',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost/api-placar',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -12,14 +12,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// On 401: clear token and redirect to login
+// On 401: clear storage and dispatch event — let React Router redirect (no full page reload)
+let handlingUnauthorized = false;
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    if (err.response?.status === 401 && !handlingUnauthorized) {
+      handlingUnauthorized = true;
       localStorage.removeItem('placar_token');
       localStorage.removeItem('placar_user');
-      window.location.href = '/login';
+      // Dispatch event so AuthContext can clear state and React Router handles redirect
+      window.dispatchEvent(new Event('placar:unauthorized'));
+      setTimeout(() => { handlingUnauthorized = false; }, 3000);
     }
     return Promise.reject(err);
   }

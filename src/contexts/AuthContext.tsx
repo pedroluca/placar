@@ -32,7 +32,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(JSON.parse(storedUser));
     }
     setLoading(false);
-  }, []);
+
+    // Listen for 401 events from axios interceptor — clears state so ProtectedRoute redirects
+    const onUnauthorized = () => logout();
+    window.addEventListener('placar:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('placar:unauthorized', onUnauthorized);
+  }, [logout]);
 
   const login = async (username: string, password: string) => {
     const res = await api.post('/auth.php', { username, password });

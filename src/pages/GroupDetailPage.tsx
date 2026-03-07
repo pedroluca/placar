@@ -84,12 +84,19 @@ export default function GroupDetailPage() {
             {ranking.ranking.map((entry, i) => (
               <div key={entry.player_name} className="flex items-center gap-3 px-4 py-3">
                 <div className="w-6 flex items-center justify-center shrink-0">{medal(i)}</div>
-                <div className="flex-1 font-semibold text-white">{entry.player_name}</div>
-                <div className="text-right text-sm">
-                  <span className="text-emerald-400 font-bold">{entry.sessions_won}</span>
-                  <span className="text-gray-600"> jog.</span>
-                  <span className="ml-2 text-gray-400">{entry.rounds_won}</span>
-                  <span className="text-gray-600"> rod.</span>
+                <div className="flex-1 font-semibold text-white text-sm truncate">{entry.player_name}</div>
+                <div className="text-right text-xs space-y-0.5 shrink-0">
+                  <div>
+                    <span className="text-emerald-400 font-bold">{entry.sessions_won}</span>
+                    <span className="text-gray-600"> jog.</span>
+                    <span className="ml-1.5 text-gray-300 font-semibold">{entry.rounds_won}</span>
+                    <span className="text-gray-600"> rod.</span>
+                  </div>
+                  {(entry.total_score ?? 0) > 0 && (
+                    <div className="text-yellow-400 font-semibold">
+                      {entry.total_score} pts
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

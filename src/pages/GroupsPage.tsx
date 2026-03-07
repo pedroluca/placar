@@ -51,7 +51,7 @@ export default function GroupsPage() {
           <Users className="w-5 h-5 text-emerald-400" /> Grupos
         </h1>
         <button onClick={() => setShow(true)}
-          className="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold px-3 py-1.5 rounded-xl text-sm flex items-center gap-1.5 transition-all"
+          className="cursor-pointer bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold px-3 py-1.5 rounded-xl text-sm flex items-center gap-1.5 transition-all"
         >
           <Plus className="w-4 h-4" /> Novo
         </button>
@@ -123,7 +123,7 @@ export default function GroupsPage() {
               )}
               {error && <p className="text-red-400 text-xs">{error}</p>}
               <button type="submit" disabled={saving}
-                className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-gray-950 font-bold py-3 rounded-xl transition-all"
+                className="cursor-pointer w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-gray-950 font-bold py-3 rounded-xl transition-all"
               >
                 {saving ? 'Criando…' : 'Criar Grupo'}
               </button>

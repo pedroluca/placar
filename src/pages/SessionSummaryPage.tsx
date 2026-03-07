@@ -84,13 +84,13 @@ export default function SessionSummaryPage() {
       {/* Actions */}
       <div className="grid grid-cols-2 gap-3">
         <Link to="/"
-          className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-2xl py-4 text-sm font-semibold text-gray-300 transition-all"
+          className="cursor-pointer flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded-2xl py-4 text-sm font-semibold text-gray-300 transition-all"
         >
           <Home className="w-4 h-4" /> Início
         </Link>
         <button
           onClick={() => navigate('/sessions/new')}
-          className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 rounded-2xl py-4 text-sm font-bold text-gray-950 transition-all"
+          className="cursor-pointer flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 rounded-2xl py-4 text-sm font-bold text-gray-950 transition-all"
         >
           <RotateCcw className="w-4 h-4" /> Nova jogatina
         </button>

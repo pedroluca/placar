@@ -11,11 +11,13 @@ function statusBadge(status: string) {
 }
 
 function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const min  = Math.floor(diff / 60000)
-  if (min < 60) return `${min}m atrás`
+  // MySQL returns timestamps without timezone info — treat as UTC
+  const utcStr = dateStr.endsWith('Z') ? dateStr : dateStr.replace(' ', 'T') + 'Z'
+  const diff   = Date.now() - new Date(utcStr).getTime()
+  const min    = Math.floor(diff / 60000)
+  if (min < 60)  return `${min}m atrás`
   const h = Math.floor(min / 60)
-  if (h < 24) return `${h}h atrás`
+  if (h < 24)    return `${h}h atrás`
   return `${Math.floor(h / 24)}d atrás`
 }
 
@@ -49,7 +51,7 @@ export default function Dashboard() {
       {/* CTA */}
       <button
         onClick={() => navigate('/sessions/new')}
-        className="w-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 transition-all text-gray-950 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-base shadow-lg shadow-emerald-500/20"
+        className="cursor-pointer w-full bg-emerald-500 hover:bg-emerald-400 active:scale-95 transition-all text-gray-950 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-base shadow-lg shadow-emerald-500/20"
       >
         <Plus className="w-5 h-5" />
         Nova Jogatina
