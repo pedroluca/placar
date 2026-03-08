@@ -512,9 +512,12 @@ export default function SessionPage() {
               </div>
             )}
 
-            <div className="bg-gray-800 rounded-xl px-3 py-2.5 mb-4">
-              <p className="text-sm text-gray-200">{leaderMsg}</p>
-            </div>
+            {/* Líder atual — só mostra se tiver algo registrado */}
+            {leaderMsg && (totalRounds > 0 || isMatchMode) && (
+              <div className="bg-gray-800 rounded-xl px-3 py-2.5 mb-4">
+                <p className="text-sm text-gray-200">{leaderMsg}</p>
+              </div>
+            )}
 
             {isMatchMode && (
               <div className="space-y-2 mb-3">
@@ -533,22 +536,27 @@ export default function SessionPage() {
               </div>
             )}
 
-            <p className="text-xs text-gray-500 mb-3">Sobrescreva o vencedor se necessário:</p>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {players.map(p => {
-                const hex = hexFor(p.color)
-                return (
-                  <button key={p.id} onClick={() => setEndWinnerId(endWinnerId === p.id ? null : p.id)}
-                    className="cursor-pointer py-2 px-3 rounded-xl text-sm font-medium border transition-all"
-                    style={endWinnerId === p.id
-                      ? { backgroundColor: `${hex}25`, borderColor: `${hex}60`, color: hex }
-                      : { backgroundColor: 'transparent', borderColor: '#374151', color: '#9ca3af' }}
-                  >
-                    {p.emoji} {p.name}
-                  </button>
-                )
-              })}
-            </div>
+            {/* Sobrescrever vencedor — só faz sentido se tiver rodadas ou partidas registradas */}
+            {(totalRounds > 0 || isMatchMode) && (
+              <p className="text-xs text-gray-500 mb-3">Sobrescreva o vencedor se necessário:</p>
+            )}
+            {(totalRounds > 0 || isMatchMode) && (
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {players.map(p => {
+                  const hex = hexFor(p.color)
+                  return (
+                    <button key={p.id} onClick={() => setEndWinnerId(endWinnerId === p.id ? null : p.id)}
+                      className="cursor-pointer py-2 px-3 rounded-xl text-sm font-medium border transition-all"
+                      style={endWinnerId === p.id
+                        ? { backgroundColor: `${hex}25`, borderColor: `${hex}60`, color: hex }
+                        : { backgroundColor: 'transparent', borderColor: '#374151', color: '#9ca3af' }}
+                    >
+                      {p.emoji} {p.name}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
 
             <div className="flex flex-col gap-2">
               {/* Registrar e encerrar (só aparece se tiver pontos não salvos) */}
