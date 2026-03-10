@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Gamepad2, Lock, User } from 'lucide-react'
+import { Lock, User } from 'lucide-react'
+import Logo from '../assets/logo.svg'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -36,8 +37,9 @@ export default function LoginPage() {
         <div className="absolute -bottom-32 -right-32 w-80 h-80 bg-emerald-500/8 rounded-full" />
 
         <div className="relative z-10 text-center max-w-sm">
-          <div className="bg-emerald-500/15 border border-emerald-500/30 p-6 rounded-3xl inline-flex mb-6">
-            <Gamepad2 className="w-16 h-16 text-emerald-400" />
+          <div className="p-3 rounded-3xl inline-flex mb-6">
+            {/* <Gamepad2 className="w-16 h-16 text-emerald-400" /> */}
+            <img src={Logo} alt="Logo" className="w-40 h-40" />
           </div>
           <h1 className="text-4xl font-black text-white mb-3">Placar</h1>
           <p className="text-gray-400 text-lg leading-relaxed">
@@ -56,13 +58,14 @@ export default function LoginPage() {
       </div>
 
       {/* Painel de login */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
+      <div className="flex-1 flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-sm">
 
           {/* Logo — só no mobile */}
           <div className="flex flex-col items-center mb-8 lg:hidden">
-            <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-2xl mb-4">
-              <Gamepad2 className="w-10 h-10 text-emerald-400" />
+            <div className="p-4 rounded-2xl mb-4">
+              {/* <Gamepad2 className="w-10 h-10 text-emerald-400" /> */}
+              <img src={Logo} alt="Logo" className="w-30 h-30" />
             </div>
             <h1 className="text-2xl font-bold text-white">Placar</h1>
             <p className="text-sm text-gray-500 mt-1">Sistema de placar de jogatinas</p>
