@@ -1,6 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Home, Users, Trophy, LogOut, Gamepad2, Plus } from 'lucide-react'
+import Logo from '../assets/logo.svg'
 
 const navItems = [
   { to: '/',        icon: Home,    label: 'Início'  },
@@ -24,7 +25,8 @@ export default function Layout() {
       <aside className="hidden md:flex md:flex-col md:w-56 lg:w-64 bg-gray-900 border-r border-gray-800 fixed inset-y-0 left-0 z-40">
         {/* Brand */}
         <div className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-800">
-          <Gamepad2 className="text-emerald-400 w-6 h-6 shrink-0" />
+          {/* <Gamepad2 className="text-emerald-400 w-6 h-6 shrink-0" /> */}
+          <img src={Logo} alt="Logo" className="w-10 h-10" />
           <span className="font-bold text-white text-lg tracking-tight">Placar</span>
         </div>
 
