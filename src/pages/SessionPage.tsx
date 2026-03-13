@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
 import type { Session, SessionPlayer, ScoreboardEntry } from '../types'
-import { Trophy, RotateCcw, FlagOff, X, ChevronDown, ChevronUp, Check, Menu, AlertTriangle } from 'lucide-react'
+import { Trophy, RotateCcw, FlagOff, X, ChevronDown, ChevronUp, Check, Menu, AlertTriangle, DoorOpen } from 'lucide-react'
 
 const COLOR_HEX: Record<string, string> = {
   emerald: '#10b981', blue: '#3b82f6', purple: '#a855f7',
@@ -17,6 +17,10 @@ const ROTATIONS: Record<number, number[]> = {
   2: [180, 0],
   3: [180, 180, 0],
   4: [180, 180, 0, 0],
+  5: [180, 180, 180, 180, 0],
+  6: [180, 180, 180, 0, 0, 0],
+  7: [180, 180, 180, 180, 180, 180, 0],
+  8: [180, 180, 180, 180, 0, 0, 0, 0],
 }
 
 // ── Grid: linhas e colunas por count ─────────────────────────────────────────
@@ -24,20 +28,23 @@ function gridStyle(count: number): React.CSSProperties {
   if (count === 1) return { gridTemplateColumns: '1fr', gridTemplateRows: '1fr' }
   if (count === 2) return { gridTemplateColumns: '1fr', gridTemplateRows: '1fr 1fr' }
   if (count === 3) return { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' }
-  return { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' }
+  if (count <= 4)  return { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr' }
+  if (count <= 6)  return { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr 1fr' }
+  return { gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr 1fr 1fr' }
 }
 
 // ── Span por índice ───────────────────────────────────────────────────────────
 function cellStyle(count: number, idx: number): React.CSSProperties {
-  // 3 jogadores: último ocupa linha inteira
   if (count === 3 && idx === 2) return { gridColumn: '1 / -1' }
+  if (count === 5 && idx === 4) return { gridColumn: '1 / -1' }
+  if (count === 7 && idx === 6) return { gridColumn: '1 / -1' }
   return {}
 }
 
 // ── Painel de um jogador ──────────────────────────────────────────────────────
 function PlayerPanel({
   player, score, rotation, isMatchMode,
-  onAdd, onSub, disabled, sbEntry,
+  onAdd, onSub, disabled, sbEntry, totalPlayers,
 }: {
   player: SessionPlayer
   score: number
@@ -47,9 +54,19 @@ function PlayerPanel({
   onSub: () => void
   disabled: boolean
   sbEntry?: ScoreboardEntry
+  totalPlayers: number
 }) {
   const hex       = hexFor(player.color)
   const roundsWon = sbEntry ? Number(sbEntry.rounds_won) : 0
+  // Modo compacto quando há muitos jogadores (5+)
+  const compact   = totalPlayers >= 5
+
+  // Tamanhos responsivos ao nº de jogadores
+  const scoreSize  = compact ? 'clamp(1.6rem, 7vw, 4rem)'  : 'clamp(2.5rem, 12vw, 7rem)'
+  const btnSize    = compact ? 'clamp(1.6rem, 6vw, 3.5rem)' : 'clamp(2.5rem, 10vw, 6rem)'
+  const nameSize   = compact ? 'clamp(0.55rem, 1.6vw, 0.95rem)' : 'clamp(0.65rem, 2vw, 1.2rem)'
+  const subSize    = compact ? 'clamp(0.5rem, 1.2vw, 0.75rem)'  : 'clamp(0.55rem, 1.5vw, 0.85rem)'
+  const emojiSize  = compact ? 'clamp(0.85rem, 2.5vw, 1.4rem)'  : 'clamp(1.2rem, 4vw, 2.5rem)'
 
   return (
     <div
@@ -63,34 +80,37 @@ function PlayerPanel({
         className="cursor-pointer flex-1 w-full flex items-center justify-center active:brightness-75 transition-all disabled:opacity-30"
         style={{ transform: `rotate(${rotation}deg)` }}
       >
-        <span className="text-white/40 font-black select-none" style={{ fontSize: 'clamp(2.5rem, 10vw, 6rem)' }}>−</span>
+        <span className="text-white/40 font-black select-none" style={{ fontSize: btnSize }}>−</span>
       </button>
 
       {/* Info central */}
       <div
-        className="shrink-0 flex flex-col items-center justify-center gap-0.5 pointer-events-none py-1"
-        style={{ transform: `rotate(${rotation}deg)` }}
+        className="shrink-0 flex flex-col items-center justify-center pointer-events-none"
+        style={{ transform: `rotate(${rotation}deg)`, gap: compact ? '0' : '0.125rem', paddingBlock: compact ? '0.1rem' : '0.25rem' }}
       >
-        <span style={{ fontSize: 'clamp(1.2rem, 4vw, 2.5rem)' }}>{player.emoji}</span>
-        <span
-          className="font-bold text-white text-center leading-tight px-3"
-          style={{ fontSize: 'clamp(0.65rem, 2vw, 1.2rem)' }}
-        >
-          {player.name}
-        </span>
+        {/* Emoji + nome inline */}
+        <div className="flex items-center justify-center gap-1 px-2">
+          <span style={{ fontSize: emojiSize, lineHeight: 1 }}>{player.emoji}</span>
+          <span
+            className="font-bold text-white text-center leading-tight truncate max-w-[80%]"
+            style={{ fontSize: nameSize }}
+          >
+            {player.name}
+          </span>
+        </div>
         <span
           className="font-black leading-none"
-          style={{ color: hex, fontSize: 'clamp(2.5rem, 12vw, 7rem)' }}
+          style={{ color: hex, fontSize: scoreSize }}
         >
           {score}
         </span>
         {!isMatchMode && roundsWon > 0 && (
-          <span className="text-yellow-400 font-semibold" style={{ fontSize: 'clamp(0.55rem, 1.5vw, 0.85rem)' }}>
+          <span className="text-yellow-400 font-semibold" style={{ fontSize: subSize }}>
             🏆 {roundsWon} {roundsWon === 1 ? 'rodada' : 'rodadas'}
           </span>
         )}
         {isMatchMode && (
-          <span className="text-white/40" style={{ fontSize: 'clamp(0.55rem, 1.5vw, 0.85rem)' }}>
+          <span className="text-white/40" style={{ fontSize: subSize }}>
             {score === 1 ? 'partida' : 'partidas'}
           </span>
         )}
@@ -103,7 +123,7 @@ function PlayerPanel({
         className="cursor-pointer flex-1 w-full flex items-center justify-center active:brightness-75 transition-all disabled:opacity-50"
         style={{ transform: `rotate(${rotation}deg)` }}
       >
-        <span className="font-black select-none" style={{ color: hex, fontSize: 'clamp(2.5rem, 10vw, 6rem)' }}>+</span>
+        <span className="font-black select-none" style={{ color: hex, fontSize: btnSize }}>+</span>
       </button>
 
       {/* Borda sutil */}
@@ -122,15 +142,16 @@ export default function SessionPage() {
   const [loading,     setLoading]     = useState(true)
   const [saving,      setSaving]      = useState(false)
   const [error,       setError]       = useState('')
-  const [menuOpen,    setMenuOpen]    = useState(false)
-  const [showRounds,  setShowRounds]  = useState(false)
-  const [tieWinners,  setTieWinners]  = useState<Set<number>>(new Set())
-  const [showTie,     setShowTie]     = useState(false)
-  const [tiedPlayers, setTiedPlayers] = useState<SessionPlayer[]>([])
-  const [confirmEnd,  setConfirmEnd]  = useState(false)
-  const [endWinnerId, setEndWinnerId] = useState<number | null>(null)
+  const [menuOpen,      setMenuOpen]      = useState(false)
+  const [showRounds,    setShowRounds]    = useState(false)
+  const [tieWinners,    setTieWinners]    = useState<Set<number>>(new Set())
+  const [showTie,       setShowTie]       = useState(false)
+  const [tiedPlayers,   setTiedPlayers]   = useState<SessionPlayer[]>([])
+  const [confirmEnd,    setConfirmEnd]    = useState(false)
+  const [confirmAbandon, setConfirmAbandon] = useState(false)
+  const [endWinnerId,   setEndWinnerId]   = useState<number | null>(null)
   // Quando true: após salvar a rodada do tie, encerra a sessão
-  const [endAfterTie, setEndAfterTie] = useState(false)
+  const [endAfterTie,   setEndAfterTie]   = useState(false)
 
   const load = useCallback(() => {
     setLoading(true)
@@ -378,6 +399,7 @@ export default function SessionPage() {
                 onSub={onSub}
                 disabled={saving}
                 sbEntry={sbMap[player.id]}
+                totalPlayers={n}
               />
             </div>
           )
@@ -423,6 +445,12 @@ export default function SessionPage() {
                   className="cursor-pointer flex items-center gap-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-400 hover:text-red-300 font-bold px-4 py-2.5 rounded-2xl shadow-xl text-sm whitespace-nowrap transition-all"
                 >
                   <FlagOff className="w-4 h-4" /> Encerrar jogatina
+                </button>
+                <button
+                  onClick={() => { setMenuOpen(false); setConfirmAbandon(true) }}
+                  className="cursor-pointer flex items-center gap-2 bg-gray-800/80 hover:bg-gray-700 border border-gray-600/40 text-gray-400 hover:text-gray-200 font-medium px-4 py-2.5 rounded-2xl shadow-xl text-sm whitespace-nowrap transition-all"
+                >
+                  <DoorOpen className="w-4 h-4" /> Abandonar partida
                 </button>
               </div>
             </>
@@ -583,6 +611,45 @@ export default function SessionPage() {
           </div>
         </div>
       )}
+
+      {/* ── MODAL: Confirmar abandono ── */}
+      {confirmAbandon && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-end justify-center p-4 md:items-center">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-sm p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-bold text-white">Abandonar partida?</h2>
+              <button onClick={() => setConfirmAbandon(false)} className="cursor-pointer text-gray-500 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-400 mb-4">Você vai sair sem salvar pontos ou rodadas desta jogatina.</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => setConfirmAbandon(false)}
+                className="cursor-pointer w-full py-3 rounded-xl border border-gray-700 text-gray-400 hover:text-white text-sm font-medium transition-all"
+              >Cancelar</button>
+              <button
+                onClick={() => navigate('/')}
+                className="cursor-pointer w-full py-3 rounded-xl bg-gray-700 hover:bg-gray-600 text-white text-sm font-semibold transition-all flex items-center justify-center gap-2"
+              >
+                <DoorOpen className="w-4 h-4" /> Só sair
+              </button>
+              <button
+                disabled={saving}
+                onClick={async () => {
+                  setSaving(true)
+                  try { await api.delete(`/sessions.php?id=${session.id}`) } catch { /* ignora */ }
+                  navigate('/')
+                }}
+                className="cursor-pointer w-full py-3 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-400 hover:text-red-300 text-sm font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <DoorOpen className="w-4 h-4" /> Sair e excluir jogatina
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

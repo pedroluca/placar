@@ -23,12 +23,13 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
+        {/* SessionPage sem layout (fullscreen, sem navbar/header) */}
+        <Route path="sessions/:id" element={<SessionPage />} />
         <Route element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="groups" element={<GroupsPage />} />
           <Route path="groups/:id" element={<GroupDetailPage />} />
           <Route path="sessions/new" element={<NewSessionPage />} />
-          <Route path="sessions/:id" element={<SessionPage />} />
           <Route path="sessions/:id/summary" element={<SessionSummaryPage />} />
           <Route path="ranking" element={<RankingPage />} />
         </Route>
